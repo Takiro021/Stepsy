@@ -9,6 +9,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -17,6 +18,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.stepsy.R
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 
 class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     private var sensorManager: SensorManager? = null
@@ -32,7 +36,7 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stepcounter)
         checkSensorPermission(Manifest.permission.ACTIVITY_RECOGNITION, PHYSICAL_ACTIVITY_CODE)
-        loadData()
+        loadProgressFromSharedPreferences()
         resetSteps()
 
         sensorManager = getSystemService((Context.SENSOR_SERVICE)) as SensorManager
@@ -50,25 +54,36 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
-    private fun loadData() {
-        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
-        val savedNumber = sharedPreferences.getFloat("key1", 0f)
+    private fun loadProgressFromSharedPreferences() {
+        val sharedPreferences = getSharedPreferences("stepsyData", Context.MODE_PRIVATE)
+        val savedSteps = sharedPreferences.getFloat("stepsToday", 0f)
+        val savedDate = sharedPreferences.getString("date", "")
 
-        previousTotalSteps = savedNumber
+        if (savedDate != null) {
+            Log.d("123: Date: ", savedDate)
+        }
+
+        previousTotalSteps = if (savedDate == getCurrentDate()) {
+            savedSteps
+        } else {
+            0f
+        }
     }
 
     /**When saving steps, we need also to save the
      * date so we can check if there is a new day
      * when the application is launched*/
-    private fun saveData() {
+    private fun saveProgressToSharedPreferences() {
         // Shared Preferences will allow us to save
         // and retrieve data in the form of key,value pair.
         // In this function we will save data
-        val sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("stepsyData", Context.MODE_PRIVATE)
+        val currentDate = getCurrentDate()
 
-        val editor = sharedPreferences.edit()
-        editor.putFloat("key1", previousTotalSteps)
-        editor.apply()
+        val writeData = sharedPreferences.edit()
+        writeData.putFloat("stepsToday", previousTotalSteps)
+        writeData.putString("date", currentDate)
+        writeData.apply()
     }
 
     /** Check if access to the activity sensor is granted */
@@ -78,25 +93,30 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
         }
     }
 
+    private fun getCurrentDate(): String {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        return LocalDateTime.now().format(formatter)
+    }
+
     private fun resetSteps() {
         //TODO("Reset steps when there is a new day")
 
         val tvStepsTaken = findViewById<TextView>(R.id.todays_progress)
         tvStepsTaken.setOnClickListener {
             // This will give a toast message if the user want to reset the steps
-            Toast.makeText(this, "Long tap to reset steps", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Hold to reset steps", Toast.LENGTH_SHORT).show()
         }
 
         tvStepsTaken.setOnLongClickListener {
 
-            previousTotalSteps = totalSteps.toFloat()
+            previousTotalSteps = totalSteps
 
             // When the user will click long tap on the screen,
             // the steps will be reset to 0
             tvStepsTaken.text = getString(R.string.default_goal,"0")
 
             // This will save the data
-            saveData()
+            saveProgressToSharedPreferences()
 
             true
         }
