@@ -12,7 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.stepsy.R
 
-class StepCounter : AppCompatActivity(), SensorEventListener {
+class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     private var sensorManager: SensorManager? = null
 
     private var running = false

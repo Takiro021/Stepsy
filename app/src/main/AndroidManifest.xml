@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Stepsy">
         <activity
-            android:name="activity.StepCounter"
+            android:name="activity.StepCounterActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
