@@ -1,27 +1,37 @@
 package activity
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.stepsy.R
 
 class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     private var sensorManager: SensorManager? = null
+   companion object {
+       private var running = false
+       private var totalSteps = 0f
+       private var previousTotalSteps = 0f
+       private const val PHYSICAL_ACTIVITY_CODE = 100
+   }
 
-    private var running = false
-    private var totalSteps = 0f
-    private var previousTotalSteps = 0f
-
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stepcounter)
+        checkSensorPermission(Manifest.permission.ACTIVITY_RECOGNITION, PHYSICAL_ACTIVITY_CODE)
         loadData()
         resetSteps()
 
@@ -61,6 +71,12 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
         editor.apply()
     }
 
+    /** Check if access to the activity sensor is granted */
+    private fun checkSensorPermission(permission: String, requestCode: Int) {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
+        }
+    }
 
     private fun resetSteps() {
         //TODO("Reset steps when there is a new day")
