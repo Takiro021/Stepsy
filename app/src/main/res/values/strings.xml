@@ -2,6 +2,5 @@
     <string name="app_name">Stepsy</string>
     <string name="progress">Today\'s Progress</string>
     <string name="step_counter_no_sensor">There was no step sensor detected..</string>
-    <string name="total_progress_steps">%d / %d</string>
-    <string name="default_goal">%s/10000</string>
+    <string name="progress_and_goal">%s/%s</string>
 </resources>

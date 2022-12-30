@@ -9,7 +9,6 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -18,14 +17,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.stepsy.R
-import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import java.util.Calendar.SUNDAY
 
 
 class StepCounterActivity : AppCompatActivity(), SensorEventListener {
@@ -33,6 +29,7 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     private var running = false
     private var totalSteps = 0f
     private var previousTotalSteps = 0f
+    private var defaultTotalGoal = 5000
 
     companion object {
         private const val PHYSICAL_ACTIVITY_CODE = 100
@@ -111,14 +108,12 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
 
         val tvStepsTaken = findViewById<TextView>(R.id.todays_progress)
         tvStepsTaken.setOnClickListener {
-            // This will give a toast message if the user want to reset the steps
             Toast.makeText(this, "Hold to reset steps", Toast.LENGTH_SHORT).show()
         }
 
         tvStepsTaken.setOnLongClickListener {
             previousTotalSteps = totalSteps
-            tvStepsTaken.text = getString(R.string.default_goal,"0")
-            // This will save the data
+            tvStepsTaken.text = getString(R.string.progress_and_goal,"0", defaultTotalGoal.toString())
             saveProgressToSharedPreferences()
             true
         }
@@ -131,10 +126,10 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
         if(running) {
             totalSteps = sensorEvent!!.values[0]
             val currentSteps = totalSteps.toInt() - previousTotalSteps.toInt()
-            tvStepsProgress.text = getString(R.string.default_goal,"$currentSteps")
+            tvStepsProgress.text = getString(R.string.progress_and_goal,"$currentSteps", defaultTotalGoal.toString())
             tvProgressBar.progress = currentSteps
             // Todo: progressbar should be daily step goal
-            // tvProgressBar.max = 50
+            tvProgressBar.max = defaultTotalGoal
         }
     }
 
