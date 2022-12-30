@@ -18,18 +18,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.stepsy.R
+import java.time.DayOfWeek
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Calendar.SUNDAY
 
 
 class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     private var sensorManager: SensorManager? = null
-   companion object {
-       private var running = false
-       private var totalSteps = 0f
-       private var previousTotalSteps = 0f
-       private const val PHYSICAL_ACTIVITY_CODE = 100
-   }
+    private var running = false
+    private var totalSteps = 0f
+    private var previousTotalSteps = 0f
+
+    companion object {
+        private const val PHYSICAL_ACTIVITY_CODE = 100
+    }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +45,6 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
         checkSensorPermission(Manifest.permission.ACTIVITY_RECOGNITION, PHYSICAL_ACTIVITY_CODE)
         loadProgressFromSharedPreferences()
         resetSteps()
-
         sensorManager = getSystemService((Context.SENSOR_SERVICE)) as SensorManager
     }
 
@@ -55,13 +61,10 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun loadProgressFromSharedPreferences() {
-        val sharedPreferences = getSharedPreferences("stepsyData", Context.MODE_PRIVATE)
+        val fileName = "stepsyData" + getDayInWeek()
+        val sharedPreferences = getSharedPreferences(fileName, Context.MODE_PRIVATE)
         val savedSteps = sharedPreferences.getFloat("stepsToday", 0f)
         val savedDate = sharedPreferences.getString("date", "")
-
-        if (savedDate != null) {
-            Log.d("123: Date: ", savedDate)
-        }
 
         previousTotalSteps = if (savedDate == getCurrentDate()) {
             savedSteps
@@ -74,16 +77,15 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
      * date so we can check if there is a new day
      * when the application is launched*/
     private fun saveProgressToSharedPreferences() {
-        // Shared Preferences will allow us to save
-        // and retrieve data in the form of key,value pair.
-        // In this function we will save data
-        val sharedPreferences = getSharedPreferences("stepsyData", Context.MODE_PRIVATE)
         val currentDate = getCurrentDate()
+        val fileName = "stepsyData" + getDayInWeek()
 
-        val writeData = sharedPreferences.edit()
-        writeData.putFloat("stepsToday", previousTotalSteps)
-        writeData.putString("date", currentDate)
-        writeData.apply()
+        val sharedPreferences = getSharedPreferences(fileName, Context.MODE_PRIVATE) ?: return
+        with (sharedPreferences.edit()) {
+            putFloat("stepsToday", previousTotalSteps)
+            putString("date", currentDate)
+            apply()
+        }
     }
 
     /** Check if access to the activity sensor is granted */
@@ -98,6 +100,12 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
         return LocalDateTime.now().format(formatter)
     }
 
+    private fun getDayInWeek(): String {
+        val instant: Instant = Instant.now()
+        val zoneDateTime: ZonedDateTime = instant.atZone(ZoneId.of("ECT"))
+        return zoneDateTime.dayOfWeek.toString()
+    }
+
     private fun resetSteps() {
         //TODO("Reset steps when there is a new day")
 
@@ -108,16 +116,10 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
         }
 
         tvStepsTaken.setOnLongClickListener {
-
             previousTotalSteps = totalSteps
-
-            // When the user will click long tap on the screen,
-            // the steps will be reset to 0
             tvStepsTaken.text = getString(R.string.default_goal,"0")
-
             // This will save the data
             saveProgressToSharedPreferences()
-
             true
         }
     }
@@ -134,7 +136,6 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
             // Todo: progressbar should be daily step goal
             // tvProgressBar.max = 50
         }
-
     }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
