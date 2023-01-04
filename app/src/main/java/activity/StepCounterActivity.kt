@@ -17,12 +17,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.stepsy.R
+import notifications.NotificationHelper
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-
 
 class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     private var sensorManager: SensorManager? = null
@@ -38,6 +38,11 @@ class StepCounterActivity : AppCompatActivity(), SensorEventListener {
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // TODO Move to splashscreen activity
+        NotificationHelper.createNotificationChannel(this)
+        NotificationHelper.scheduleWalkNotification(this)
+
         setContentView(R.layout.activity_stepcounter)
         checkSensorPermission(Manifest.permission.ACTIVITY_RECOGNITION, PHYSICAL_ACTIVITY_CODE)
         loadProgressFromSharedPreferences()
