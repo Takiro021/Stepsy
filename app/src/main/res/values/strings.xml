@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">Stepsy</string>
+    <string name="progress">Today\'s Progress</string>
+    <string name="step_counter_no_sensor">There was no step sensor detected..</string>
+    <string name="progress_and_goal">%s/%s</string>
+    <string name="notification_service">Service</string>
+    <string name="notification_service_description">Information about service</string>
+    <string name="notification_title">Stepsy - Up and Away</string>
+    <string name="notification_message">Information about service</string>
     <string name="statics">statics</string>
     <string name="home">home</string>
     <string name="settings">settings</string>
