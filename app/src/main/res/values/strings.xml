@@ -3,6 +3,8 @@
     <string name="statics">statics</string>
     <string name="home">home</string>
     <string name="settings">settings</string>
+    <string name="step_counter_no_sensor">TEST TOAST</string>
+    <string name="progress_and_goal">%s/%s</string>
 
     <!-- Preference Titles -->
     <string name="personal_goal">Personal Goal</string>
@@ -11,6 +13,12 @@
     <!-- Messages Preferences -->
     <string name="signature_title">Your signature</string>
     <string name="language">Language</string>
+
+    <!-- Notifications -->
+    <string name="notification_service">Service</string>
+    <string name="notification_service_description">Information about service</string>
+    <string name="notification_title">Stepsy - Up and Away</string>
+    <string name="notification_message">Great job so far! Keep moving and become a better version of yourself</string>
 
     <!-- Sync Preferences -->
     <string name="dark_mode">Dark Mode</string>
