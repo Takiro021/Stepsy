@@ -24,6 +24,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 class HomeFragment : Fragment(), SensorEventListener {
     companion object {
@@ -35,13 +36,14 @@ class HomeFragment : Fragment(), SensorEventListener {
 
     private var totalAmountOfSteps = 0f
     private var previousSteps = 0f
-    private var defaultTotalGoal = 10000
+    private var dailyGoal = 10000
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         checkSensorPermission(Manifest.permission.ACTIVITY_RECOGNITION, PERMISSIONS_REQUEST_ACTIVITY_RECOGNITION)
+        getDailyGoalFromSharedPreferences()
         loadProgressFromSharedPreferences()
         sensorManager = context?.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
@@ -54,7 +56,7 @@ class HomeFragment : Fragment(), SensorEventListener {
     ): View {
         // Inflate the layout for this fragment using view binding
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        binding.simpleProgressBar.max = defaultTotalGoal
+        binding.simpleProgressBar.max = dailyGoal
         return binding.root
     }
 
@@ -64,17 +66,24 @@ class HomeFragment : Fragment(), SensorEventListener {
         }
     }
 
-    private fun loadProgressFromSharedPreferences() {
-        val fileName = "stepsyData" + getDayInWeek()
+    private fun getDailyGoalFromSharedPreferences() {
+        val fileName = "com.example.stepsy_preferences"
         val sharedPreferences = requireContext().getSharedPreferences(fileName, MODE_PRIVATE)
-        val savedSteps = sharedPreferences.getFloat("stepsToday", 0f)
+        dailyGoal = sharedPreferences.getString("dailyGoal", "")?.toInt() ?: 10000
+    }
+
+    private fun loadProgressFromSharedPreferences() {
+        var fileName = "stepsyData" + getDayInWeek()
+        var sharedPreferences = requireContext().getSharedPreferences(fileName, MODE_PRIVATE)
+        var savedSteps = sharedPreferences.getFloat("stepsToday", 0f)
         val savedDate = sharedPreferences.getString("date", "")
 
-        previousSteps = if (savedDate == getCurrentDate()) {
-            savedSteps
-        } else {
-            0f
+        if (savedDate != getCurrentDate()) {
+            fileName = "stepsyData" + getYesterday()
+            sharedPreferences = requireContext().getSharedPreferences(fileName, MODE_PRIVATE)
+            savedSteps = sharedPreferences.getFloat("stepsToday", 0f)
         }
+        previousSteps = savedSteps
     }
 
     /**When saving steps, we need also to save the
@@ -103,6 +112,14 @@ class HomeFragment : Fragment(), SensorEventListener {
         return zoneDateTime.dayOfWeek.toString()
     }
 
+    private fun getYesterday(): String {
+        val instant: Instant = Instant.now()
+        val yesterday: Instant = instant.minus(1, ChronoUnit.DAYS)
+        val zoneDateTime: ZonedDateTime = yesterday.atZone(ZoneId.of("ECT"))
+        return zoneDateTime.dayOfWeek.toString()
+    }
+
+
     override fun onResume() {
         super.onResume()
         running = true
@@ -117,8 +134,8 @@ class HomeFragment : Fragment(), SensorEventListener {
     }
 
     override fun onPause() {
-        super.onPause()
         saveProgressToSharedPreferences()
+        super.onPause()
         sensorManager?.unregisterListener(this)
     }
 
@@ -130,7 +147,7 @@ class HomeFragment : Fragment(), SensorEventListener {
             binding.textViewSteps.text = getString(
                 R.string.progress_and_goal,
                 "${currentSteps.toInt()}",
-                defaultTotalGoal.toString()
+                dailyGoal.toString()
             )
             binding.simpleProgressBar.progress = currentSteps.toInt()
         }
