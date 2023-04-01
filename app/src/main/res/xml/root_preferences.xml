@@ -3,7 +3,8 @@
     <PreferenceCategory app:title="settings">
 
         <EditTextPreference
-            app:key="signature"
+            app:defaultValue="10000"
+            app:key="dailyGoal"
             app:title="@string/personal_goal"
             app:useSimpleSummaryProvider="true" />
 
