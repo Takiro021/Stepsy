@@ -1,59 +1,68 @@
 package com.example.stepsy
 
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.stepsy.databinding.FragmentHomeBinding
+import com.example.stepsy.databinding.FragmentStaticsBinding
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [StaticsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class StaticsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var binding: FragmentStaticsBinding
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_statics, container, false)
+    ): View {
+        // Inflate the layout for this fragment using view binding
+        binding = FragmentStaticsBinding.inflate(inflater, container, false)
+        loadProgressFromSharedPreferences()
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment StaticsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            StaticsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    private fun loadProgressFromSharedPreferences() {
+        val fileMonday = "stepsyDataMONDAY"
+        val fileTuesday = "stepsyDataTUEDAY"
+        val fileWednesday = "stepsyDataWEDNESDAY"
+        val fileThursday = "stepsyDataTHURDAY"
+        val fileFriday = "stepsyDataFRIDAY"
+        val fileSaturday = "stepsyDataSATURDAY"
+        val fileSunday = "stepsyDataSUNDAY"
+
+        val fileNames = arrayOf(
+            fileMonday,
+            fileTuesday,
+            fileWednesday,
+            fileThursday,
+            fileFriday,
+            fileSaturday,
+            fileSunday,
+        )
+
+        fileNames.forEach { day ->
+            val sharedPreferences = requireContext().getSharedPreferences(day,
+                Context.MODE_PRIVATE
+            )
+            val savedSteps = sharedPreferences.getFloat("stepsToday", 0f).toInt().toString()
+
+            when(day) {
+                fileMonday -> binding.statsMonday.text = savedSteps
+                fileTuesday -> binding.statTuesday.text = savedSteps
+                fileWednesday -> binding.statsWednesday.text = savedSteps
+                fileThursday -> binding.statsThursday.text = savedSteps
+                fileFriday -> binding.statsFriday.text = savedSteps
+                fileSaturday -> binding.statsSaturday.text = savedSteps
+                fileSunday -> binding.statsSunday.text = savedSteps
             }
+        }
     }
 }
