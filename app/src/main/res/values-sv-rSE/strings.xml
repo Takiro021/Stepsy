@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Stepsy</string>
+    <string name="statics">statistik</string>
+    <string name="home">hem</string>
+    <string name="settings">Inställningar</string>
+    <string name="personal_goal">Personligt mål</string>
+    <string name="language">Språk</string>
+    <string name="notification_service">Service</string>
+    <string name="notification_title">Upp och hopp</string>
+    <string name="notification_message">Bra jobbat hittills! Fortsätt framåt och bli en bättre version av dig själv</string>
+    <string name="notification_service_description">Information om service</string>
+    <string name="notifications">Notifieringar</string>
+</resources>

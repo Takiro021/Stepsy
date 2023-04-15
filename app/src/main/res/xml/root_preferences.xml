@@ -1,19 +1,11 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="settings">
+    <PreferenceCategory app:title="@string/settings">
 
         <EditTextPreference
             app:defaultValue="10000"
             app:key="dailyGoal"
             app:title="@string/personal_goal"
-            app:useSimpleSummaryProvider="true" />
-
-        <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/language"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

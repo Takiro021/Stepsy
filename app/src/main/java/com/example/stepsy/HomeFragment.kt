@@ -1,6 +1,7 @@
 package com.example.stepsy
 
 import android.Manifest
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
@@ -10,6 +11,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,7 +72,13 @@ class HomeFragment : Fragment(), SensorEventListener {
     private fun getDailyGoalFromSharedPreferences() {
         val fileName = "com.example.stepsy_preferences"
         val sharedPreferences = requireContext().getSharedPreferences(fileName, MODE_PRIVATE)
-        dailyGoal = sharedPreferences.getString("dailyGoal", "")?.toInt() ?: 10000
+
+        try {
+            dailyGoal = sharedPreferences.getString("dailyGoal", "")?.toInt() ?: 10000
+        } catch (e: NumberFormatException) {
+            // or you can log an error here to help with debugging
+            Log.e(TAG, "Error parsing daily goal from shared preferences: ${e.message}")
+        }
     }
 
     private fun loadProgressFromSharedPreferences() {
