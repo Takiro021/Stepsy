@@ -49,7 +49,6 @@ class HomeFragment : Fragment(), SensorEventListener {
         getDailyGoalFromSharedPreferences()
         loadProgressFromSharedPreferences()
         sensorManager = context?.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-
     }
 
     override fun onCreateView(
