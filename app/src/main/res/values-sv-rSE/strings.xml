@@ -11,4 +11,14 @@
     <string name="notification_message">Bra jobbat hittills! Fortsätt framåt och bli en bättre version av dig själv</string>
     <string name="notification_service_description">Information om service</string>
     <string name="notifications">Notifieringar</string>
+
+    <!-- Days -->
+    <string name="monday">Måndag</string>
+    <string name="tuesday">Tisdag</string>
+    <string name="wednesday">Onsdag</string>
+    <string name="thursday">Torsdag</string>
+    <string name="friday">Fredag</string>
+    <string name="saturday">Lördag</string>
+    <string name="sunday">Söndag</string>
+    <string name="Default_Zero">0</string>
 </resources>
