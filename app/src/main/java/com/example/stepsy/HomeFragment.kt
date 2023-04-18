@@ -83,14 +83,18 @@ class HomeFragment : Fragment(), SensorEventListener {
     private fun loadProgressFromSharedPreferences() {
         var fileName = "stepsyData" + getDayInWeek()
         var sharedPreferences = requireContext().getSharedPreferences(fileName, MODE_PRIVATE)
-        var savedSteps = sharedPreferences.getFloat("stepsToday", 0f)
         val savedDate = sharedPreferences.getString("date", "")
+        var savedSteps = sharedPreferences.getFloat("stepsTotal", 0f)
 
         if (savedDate != getCurrentDate()) {
             fileName = "stepsyData" + getYesterday()
             sharedPreferences = requireContext().getSharedPreferences(fileName, MODE_PRIVATE)
             savedSteps = sharedPreferences.getFloat("stepsTotal", 0f)
+        } else {
+            val current = sharedPreferences.getFloat("stepsToday", 0f)
+            savedSteps -= current
         }
+
         previousSteps = savedSteps
     }
 
@@ -107,6 +111,8 @@ class HomeFragment : Fragment(), SensorEventListener {
             putString("date", currentDate)
             putFloat("stepsTotal", totalAmountOfSteps)
 
+            println("123: Total $totalAmountOfSteps")
+            println("123: Current $currentSteps")
             apply()
         }
     }
@@ -154,9 +160,7 @@ class HomeFragment : Fragment(), SensorEventListener {
             totalAmountOfSteps = event!!.values[0]
 
             currentSteps = totalAmountOfSteps - previousSteps
-            if(currentSteps < 0f) {
-                currentSteps = 0f
-            }
+
             binding.textViewSteps.text = getString(
                 R.string.progress_and_goal,
                 "${currentSteps.toInt()}",
