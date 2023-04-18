@@ -1,6 +1,7 @@
 package com.example.stepsy
 
 import android.Manifest
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.pm.PackageManager
@@ -10,6 +11,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,20 +72,30 @@ class HomeFragment : Fragment(), SensorEventListener {
     private fun getDailyGoalFromSharedPreferences() {
         val fileName = "com.example.stepsy_preferences"
         val sharedPreferences = requireContext().getSharedPreferences(fileName, MODE_PRIVATE)
-        dailyGoal = sharedPreferences.getString("dailyGoal", "")?.toInt() ?: 10000
+
+        try {
+            dailyGoal = sharedPreferences.getString("dailyGoal", "")?.toInt() ?: 10000
+        } catch (e: NumberFormatException) {
+            // or you can log an error here to help with debugging
+            Log.e(TAG, "Error parsing daily goal from shared preferences: ${e.message}")
+        }
     }
 
     private fun loadProgressFromSharedPreferences() {
         var fileName = "stepsyData" + getDayInWeek()
         var sharedPreferences = requireContext().getSharedPreferences(fileName, MODE_PRIVATE)
-        var savedSteps = sharedPreferences.getFloat("stepsToday", 0f)
         val savedDate = sharedPreferences.getString("date", "")
+        var savedSteps = sharedPreferences.getFloat("stepsTotal", 0f)
 
         if (savedDate != getCurrentDate()) {
             fileName = "stepsyData" + getYesterday()
             sharedPreferences = requireContext().getSharedPreferences(fileName, MODE_PRIVATE)
             savedSteps = sharedPreferences.getFloat("stepsTotal", 0f)
+        } else {
+            val current = sharedPreferences.getFloat("stepsToday", 0f)
+            savedSteps -= current
         }
+
         previousSteps = savedSteps
     }
 
@@ -100,6 +112,8 @@ class HomeFragment : Fragment(), SensorEventListener {
             putString("date", currentDate)
             putFloat("stepsTotal", totalAmountOfSteps)
 
+            println("123: Total $totalAmountOfSteps")
+            println("123: Current $currentSteps")
             apply()
         }
     }
@@ -147,9 +161,7 @@ class HomeFragment : Fragment(), SensorEventListener {
             totalAmountOfSteps = event!!.values[0]
 
             currentSteps = totalAmountOfSteps - previousSteps
-            if(currentSteps < 0f) {
-                currentSteps = 0f
-            }
+
             binding.textViewSteps.text = getString(
                 R.string.progress_and_goal,
                 "${currentSteps.toInt()}",

@@ -1,18 +1,12 @@
 package com.example.stepsy
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.stepsy.databinding.FragmentHomeBinding
 import com.example.stepsy.databinding.FragmentStaticsBinding
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
 
 class StaticsFragment : Fragment() {
 
